@@ -2,6 +2,7 @@ package ca.utoronto.utm.mcs;
 
 import java.sql.*;
 import io.github.cdimascio.dotenv.Dotenv;
+import java.util.UUID;
 
 public class PostgresDAO {
 	
@@ -13,9 +14,9 @@ public class PostgresDAO {
         String addr = dotenv.get("POSTGRES_ADDR");
         String url = "jdbc:postgresql://" + addr + ":5432/root";
 		try {
-            Class.forName("org.postgresql.Driver");
-			this.conn = DriverManager.getConnection(url, "root", "123456");
-            this.st = this.conn.createStatement();
+        Class.forName("org.postgresql.Driver");
+			  this.conn = DriverManager.getConnection(url, "root", "123456");
+        this.st = this.conn.createStatement();
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
@@ -35,6 +36,32 @@ public class PostgresDAO {
         query = String.format(query, uid);
         return this.st.executeQuery(query);
     }
+
+    public int createNextUID() throws SQLException {
+        String query = "SELECT COUNT(*) FROM users";
+        ResultSet rs = this.st.executeQuery(query);
+        rs.next();
+        return rs.getInt("count");
+    }
+
+
+    public ResultSet getUserDataFromEmail(String email) throws SQLException {
+        String query = "SELECT uid, prefer_name as name, email, rides, isdriver FROM users WHERE email = '%s'";
+        query = String.format(query, email);
+        return this.st.executeQuery(query);
+    }
+
+    public int createUser(String name, String email, String password) throws  SQLException {
+        String query = "INSERT INTO users(uid, password, email, prefer_name, rides, isdriver)"
+            + " VALUES('%s', '%s', '%s', '%s', 0, false)";
+        query = String.format(query, createNextUID(), password, email, name);
+        this.st.execute(query);
+        ResultSet rs = getUserDataFromEmail(email);
+        rs.next();
+        int uid = rs.getInt("uid");
+        return uid;
+    }
+
 
     public void updateUserAttributes(int uid, String email, String password, String prefer_name, Integer rides, Boolean isDriver) throws SQLException {
 
