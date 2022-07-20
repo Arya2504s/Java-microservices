@@ -46,7 +46,8 @@ public class PostgresDAO {
 
 
     public ResultSet getUserDataFromEmail(String email) throws SQLException {
-        String query = "SELECT uid, prefer_name as name, email, rides, isdriver FROM users WHERE email = '%s'";
+        String query = "SELECT uid, prefer_name as name, password, email, rides, isdriver"
+            + " FROM users WHERE email = '%s'";
         query = String.format(query, email);
         return this.st.executeQuery(query);
     }
