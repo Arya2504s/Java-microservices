@@ -45,6 +45,7 @@ public class Neo4jDAO {
         return this.session.run(query);
     }
 
+
     public Result updateUserIsDriver(String uid, boolean isDriver) {
         String query = "MATCH (n:user {uid: '%s'}) SET n.is_driver = %b RETURN n";
         query = String.format(query, uid, isDriver);
@@ -84,6 +85,11 @@ public class Neo4jDAO {
     public Result deleteRoute(String roadname1, String roadname2) {
         String query = "MATCH (r1:road {name: '%s'})-[r:ROUTE_TO]->(r2:road {name: '%s'}) DELETE r RETURN COUNT(r) AS numDeletedRoutes";
         query = String.format(query, roadname1, roadname2);
+        return this.session.run(query);
+    }
+
+    public Result getAllDrivers() {
+        String query = "MATCH (n: user {is_driver: true }) RETURN n";
         return this.session.run(query);
     }
 } 
