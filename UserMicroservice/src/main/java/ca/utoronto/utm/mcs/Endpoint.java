@@ -81,6 +81,7 @@ public abstract class Endpoint implements HttpHandler {
         for (int i = 0; i < fields.length; i++) {
             try {
                 if (!JSONRequest.has(fields[i]) || !JSONRequest.get(fields[i]).getClass().equals(fieldClasses[i])) {
+                    System.out.println(String.format("%s: in the body = %b, class = %s", JSONRequest.has(fields[i]), JSONRequest.get(fields[i]).getClass()));
                     return false;
                 }
             } catch (Exception e) {
