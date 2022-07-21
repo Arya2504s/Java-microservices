@@ -74,11 +74,14 @@ public class Navigation extends Endpoint {
             }
 
             Result result = this.dao.getNavigationPath(driverStreet, passengerStreet);
-            System.out.println(result.hasNext());
+            if (!result.hasNext()) {
+                this.sendStatus(r, 404);
+                return;
+            }
             for (Record rec: result.list()) {
                 System.out.println(rec);
                 rec.keys().forEach(key -> {
-                    System.out.println(rec.get(key));
+                    System.out.println(key + ": " + rec.get(key));
                 });
             }
             this.sendStatus(r, 200);
