@@ -48,9 +48,9 @@ public class Nearby extends Endpoint {
 
         // check if uid and radius is integer, return 400 if not
         String uidString = splitUrl[3];
-        int radius;
+        Double radius;
         try {
-            radius = Integer.parseInt(map.get("radius"));
+            radius = Double.parseDouble(map.get("radius"));
         } catch (Exception e){
             e.printStackTrace();
             this.sendStatus(r, 400);
@@ -59,43 +59,41 @@ public class Nearby extends Endpoint {
 
         try {
             Result result = this.dao.getUserLocationByUid(uidString);
-            Integer userLon = null, userLat = null;
+            Double userLon = null, userLat = null;
             String street = null;
             for (Record rec: result.list()){
-                userLon = Integer.parseInt(rec.get("n.longitude").toString());
-                userLat = Integer.parseInt(rec.get("n.latitude").toString());
+                userLon = Double.parseDouble(rec.get("n.longitude").toString());
+                userLat = Double.parseDouble(rec.get("n.latitude").toString());
                 street = rec.get("n.street").toString();
             }
             if (userLon == null || userLat == null || street == null) {
                 this.sendStatus(r, 404);
                 return;
             }
-            System.out.println(userLon);
-            System.out.println(userLat);
-            System.out.println(street);
-
-            result = this.dao.getAllDrivers();
+            result = this.dao.getAllDriversInRadius(radius, userLon, userLat);
 
             JSONObject resp = new JSONObject();
             JSONObject data = new JSONObject();
+
             for (Record rec : result.list()) {
-                int driverLong = Integer.parseInt(rec.get("n.longitude").toString());
-                int driverLat = Integer.parseInt(rec.get("n.latitude").toString());
+                Double driverLong = Double.parseDouble(rec.get("n.longitude").toString());
+                Double driverLat = Double.parseDouble(rec.get("n.latitude").toString());
                 String driverStreet = rec.get("n.street").toString();
                 String driverId = rec.get("n.uid").toString();
 
-
+                JSONObject driver = new JSONObject();
+                driver.put("longitude", driverLong);
+                driver.put("latitude", driverLat);
+                driver.put("street", driverStreet);
+                data.put(driverId, driver);
             }
 
+            resp.put("data", data);
             this.sendResponse(r, resp, 200);
-
-
         } catch (Exception e) {
             e.printStackTrace();
             this.sendStatus(r, 500);
             return;
         }
-
-        this.sendStatus(r, 200);
     }
 }

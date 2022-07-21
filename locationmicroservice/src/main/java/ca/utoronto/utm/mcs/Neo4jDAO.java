@@ -88,8 +88,13 @@ public class Neo4jDAO {
         return this.session.run(query);
     }
 
-    public Result getAllDrivers() {
-        String query = "MATCH (n: user {is_driver: true }) RETURN n";
+    public Result getAllDriversInRadius(Double radius, Double longitude, Double latitude) {
+        String query = "MATCH (n: user {is_driver: true })"
+            + " WITH point({longitude: n.longitude, latitude: n.latitude}) AS driverPoint,"
+            + " point({longitude: %f, latitude: %f}) AS userPoint, n"
+            + " WHERE round(point.distance(driverPoint, userPoint)) < %f"
+            + " RETURN n.uid, driverPoint, userPoint, n.longitude, n.latitude, n.street";
+        query = String.format(query, longitude, latitude, radius);
         return this.session.run(query);
     }
 } 
