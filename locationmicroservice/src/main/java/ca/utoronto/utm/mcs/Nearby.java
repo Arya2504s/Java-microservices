@@ -50,7 +50,7 @@ public class Nearby extends Endpoint {
         String uidString = splitUrl[3];
         Double radius;
         try {
-            radius = Double.parseDouble(map.get("radius"));
+            radius = Double.parseDouble(map.get("radius"))*1000;
         } catch (Exception e){
             e.printStackTrace();
             this.sendStatus(r, 400);

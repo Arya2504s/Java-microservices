@@ -97,4 +97,16 @@ public class Neo4jDAO {
         query = String.format(query, longitude, latitude, radius);
         return this.session.run(query);
     }
-} 
+
+    public Result getNavigationPath(String startStreet, String destinationStreet){
+        String query = "MATCH (source: road {street: %s}), (target: road {street: %s})"
+            + " CALL gds.shortestPath.dijkstra.stream('ROUTE_TO', "
+            + " {writeRelationshipType: 'ROUTE_TO', relationshipWeightProperty: 'road.travel_time'})"
+            + " YIELD totalCost, nodeIds, costs, path"
+            + " RETURN totalCost, nodeIds, costs, path";
+        query = String.format(query, startStreet, destinationStreet);
+        return this.session.run(query);
+    }
+}
+
+//sourceNode: source, targetNode: target,
