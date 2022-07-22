@@ -20,6 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Request extends Endpoint {
 
@@ -72,7 +73,7 @@ public class Request extends Endpoint {
             //Read JSON response and print
             JSONObject myResponse = new JSONObject(response.toString());
             JSONObject var = new JSONObject();
-            var.put("data", myResponse.getJSONObject("data").keys());
+            var.put("data",  myResponse.getJSONObject("data").names());
             this.sendResponse(r, var, 200);
         }
         else{
