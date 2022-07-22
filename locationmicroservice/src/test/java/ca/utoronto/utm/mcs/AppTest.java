@@ -114,36 +114,36 @@ public class AppTest {
 
     @AfterAll
     public static void teardown() throws IOException, InterruptedException {
-//        try {
-//            HttpClient client = HttpClient.newHttpClient();
-//            String body = "{\"uid\": \"passenger\"}";
-//            HttpRequest request = HttpRequest.newBuilder()
-//                .uri(URI.create("http://0.0.0.0:8200/location/user"))
-//                .header("Content-Type", "application/json")
-//                .method("DELETE", BodyPublishers.ofString(body))
-//                .build();
-//            HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-//
-//            client = HttpClient.newHttpClient();
-//            body = "{\"uid\": \"driver\"}";
-//            request = HttpRequest.newBuilder()
-//                .uri(URI.create("http://0.0.0.0:8200/location/user"))
-//                .header("Content-Type", "application/json")
-//                .method("DELETE", BodyPublishers.ofString(body))
-//                .build();
-//            response = client.send(request, BodyHandlers.ofString());
-//
-//            client = HttpClient.newHttpClient();
-//            body = "{\"roadName1\": \"street2\", \"roadName2\": \"street1\"}";
-//            request = HttpRequest.newBuilder()
-//                .uri(URI.create("http://0.0.0.0:8200/location/route"))
-//                .header("Content-Type", "application/json")
-//                .method("DELETE", BodyPublishers.ofString(body))
-//                .build();
-//            response = client.send(request, BodyHandlers.ofString());
-//        } catch (Exception e){
-//            e.printStackTrace();
-//        }
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            String body = "{\"uid\": \"passenger\"}";
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://0.0.0.0:8000/location/user"))
+                .header("Content-Type", "application/json")
+                .method("DELETE", BodyPublishers.ofString(body))
+                .build();
+            HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+
+            client = HttpClient.newHttpClient();
+            body = "{\"uid\": \"driver\"}";
+            request = HttpRequest.newBuilder()
+                .uri(URI.create("http://0.0.0.0:8000/location/user"))
+                .header("Content-Type", "application/json")
+                .method("DELETE", BodyPublishers.ofString(body))
+                .build();
+            response = client.send(request, BodyHandlers.ofString());
+
+            client = HttpClient.newHttpClient();
+            body = "{\"roadName1\": \"street2\", \"roadName2\": \"street1\"}";
+            request = HttpRequest.newBuilder()
+                .uri(URI.create("http://0.0.0.0:8000/location/route"))
+                .header("Content-Type", "application/json")
+                .method("DELETE", BodyPublishers.ofString(body))
+                .build();
+            response = client.send(request, BodyHandlers.ofString());
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Test
