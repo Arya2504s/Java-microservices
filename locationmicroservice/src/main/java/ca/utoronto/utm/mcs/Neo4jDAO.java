@@ -99,18 +99,25 @@ public class Neo4jDAO {
     }
 
     public Result getNavigationPath(String startStreet, String destinationStreet){
+        try {
+            String query = "CALL gds.graph.exists('routeGraph)";
+            Result result = this.session.run(query);
+            if (!result.hasNext()){
+                query = "CALL gds.graph.project('routeGraph', 'road', 'ROUTE_TO', {relationshipProperties:['travel_time']})";
+                this.session.run(query);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         String query = "MATCH (source: road {name: %s}), (target: road {name: %s})"
             + " CALL gds.shortestPath.dijkstra.stream('routeGraph',"
             + " {sourceNode: source, targetNode: target, relationshipWeightProperty: 'travel_time'})"
             + " YIELD index, sourceNode, targetNode, totalCost, nodeIds, costs, path"
-            + " RETURN index, totalCost, [nodeId IN nodeIds | gds.util.asNode(nodeId).name] AS nodeNames, costs, nodes(path) as path";
-//        String query = "MATCH (r1:road {name: %s})-[r:ROUTE_TO]->(r2:road {name: %s}) RETURN r";
+            + " RETURN index, totalCost, [nodeId IN nodeIds | gds.util.asNode(nodeId).name] AS roadNames, "
+            + " [nodeId IN nodeIds | gds.util.asNode(nodeId).has_traffic] AS roadTraffics, costs";
         query = String.format(query, startStreet, destinationStreet);
-//        this.session.run(query);
         System.out.println(query);
-//        query = "CALL gds.graph.list() YIELD graphName, nodeCount, relationshipCount RETURN graphName, nodeCount, relationshipCount";
         return this.session.run(query);
     }
 }
-
-//sourceNode: source, targetNode: target,

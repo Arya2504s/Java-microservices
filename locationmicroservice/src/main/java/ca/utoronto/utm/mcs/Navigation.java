@@ -1,7 +1,9 @@
 package ca.utoronto.utm.mcs;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.json.*;
 import com.sun.net.httpserver.HttpExchange;
@@ -78,13 +80,29 @@ public class Navigation extends Endpoint {
                 this.sendStatus(r, 404);
                 return;
             }
+
+            JSONObject resp = new JSONObject();
+            JSONObject data = new JSONObject();
             for (Record rec: result.list()) {
                 System.out.println(rec);
-                rec.keys().forEach(key -> {
-                    System.out.println(key + ": " + rec.get(key));
-                });
+                data.put("total_time", rec.get("totalCost"));
+                List<Object> roadNames = rec.get("roadNames").asList();
+                List<Object> roadTrafficsObject = rec.get("roadTraffics").asList();
+                List<Boolean> roadTraffics = roadTrafficsObject.stream().map(traffic -> Boolean.valueOf(traffic.toString())).toList();
+                List<Object> travelTimesObject = rec.get("costs").asList();
+                List<Integer> travelTimes = travelTimesObject.stream().map(time -> (int)Double.parseDouble(time.toString())).toList();
+                JSONObject[] routes = new JSONObject[roadNames.size()];
+                for (int i=0; i<roadNames.size(); i++){
+                    JSONObject route = new JSONObject();
+                    route.put("street", roadNames.get(i));
+                    route.put("has_traffic", roadTraffics.get(i));
+                    route.put("time", travelTimes.get(i));
+                    routes[i] = route;
+                }
+                data.put("route", routes);
             }
-            this.sendStatus(r, 200);
+            resp.put("data", data);
+            this.sendResponse(r, resp, 200);
         } catch(Exception e) {
             e.printStackTrace();
             this.sendStatus(r, 500);
