@@ -2,6 +2,7 @@ package ca.utoronto.utm.mcs;
 
 import org.neo4j.driver.*;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.neo4j.driver.Record;
 
 public class Neo4jDAO {
 
@@ -100,11 +101,17 @@ public class Neo4jDAO {
 
     public Result getNavigationPath(String startStreet, String destinationStreet){
         try {
-            String query = "CALL gds.graph.exists('routeGraph)";
+            String query = "CALL gds.graph.exists('routeGraph')";
             Result result = this.session.run(query);
-            if (!result.hasNext()){
+            Boolean exists = false;
+            for (Record res: result.list()){
+                exists = Boolean.valueOf(res.get("exists").toString());
+                System.out.println(exists);
+            }
+            if (!exists){
                 query = "CALL gds.graph.project('routeGraph', 'road', 'ROUTE_TO', {relationshipProperties:['travel_time']})";
                 this.session.run(query);
+                System.out.println("Creating routeGraph for the first time");
             }
         } catch (Exception e) {
             e.printStackTrace();
