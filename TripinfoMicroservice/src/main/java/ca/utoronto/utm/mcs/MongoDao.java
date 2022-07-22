@@ -9,6 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 public class MongoDao {
 	
 	public MongoCollection<Document> collection;
@@ -102,6 +104,20 @@ public class MongoDao {
 				return false;
 			}
 			return true;
+		}catch (Exception e) {
+			throw e;
+		}
+	}
+
+	public ArrayList<String> tripInfo(ObjectId id) {
+		FindIterable<Document> res = this.collection.find(Filters.eq("_id", id));
+		ArrayList<String> result = new ArrayList<>();
+		try {
+			for (Document doc : res) {
+				result.add(doc.getString("driver"));
+				result.add(doc.getString("passenger"));
+			}
+			return result;
 		}catch (Exception e) {
 			throw e;
 		}
