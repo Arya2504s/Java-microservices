@@ -45,7 +45,7 @@ public class Login extends Endpoint {
                     this.sendStatus(r, 401);
                     return;
                 }
-                resp.put("uid", rs.getInt("uid"));
+                resp.put("uid", String.valueOf(rs.getInt("uid")));
                 this.sendResponse(r, resp, 200);
             } else {
                 this.sendStatus(r, 404);

@@ -44,7 +44,7 @@ public class Register extends Endpoint {
             int uid = this.dao.createUser(name, email, password);
             // making the response
             JSONObject resp = new JSONObject();
-            resp.put("uid", uid);
+            resp.put("uid", String.valueOf(uid));
             this.sendResponse(r, resp, 200);
           } else {
             this.sendStatus(r, 409);
