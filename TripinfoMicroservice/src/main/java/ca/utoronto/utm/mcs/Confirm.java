@@ -30,22 +30,26 @@ public class Confirm extends Endpoint {
 
             String[] fields = {"startTime", "driver", "passenger"};
             Class<?>[] fieldClasses = {Integer.class, String.class, String.class};
-            JSONObject body = new JSONObject(Utils.convert(r.getRequestBody()));
-            if(!this.validateFields(body,fields , fieldClasses)){
-                this.sendStatus(r,400);
-                return;
+            try {
+                JSONObject body = new JSONObject(Utils.convert(r.getRequestBody()));
+                if(!this.validateFields(body,fields , fieldClasses)){
+                    this.sendStatus(r,400);
+                    return;
+                }
+                int startTime;
+                String driver, passenger;
+                startTime = body.getInt("startTime");
+                driver = body.getString("driver");
+                passenger = body.getString("passenger");
+                JSONObject id = this.dao.createTrip(startTime, driver, passenger);
+                JSONObject var = new JSONObject();
+                JSONObject var2 = new JSONObject();
+                var.put("_id", id);
+                var2.put("data", var);
+                this.sendResponse(r,var2,200);
+            }catch(Exception e){
+                this.sendStatus(r, 400);
             }
-            int startTime;
-            String driver, passenger;
-            startTime = body.getInt("startTime");
-            driver = body.getString("driver");
-            passenger = body.getString("passenger");
-            JSONObject id = this.dao.createTrip(startTime, driver, passenger);
-            JSONObject var = new JSONObject();
-            JSONObject var2 = new JSONObject();
-            var.put("_id", id);
-            var2.put("data", var);
-            this.sendResponse(r,var2,200);
         }catch(Exception e) {
             e.printStackTrace();
             this.sendStatus(r, 500);

@@ -19,14 +19,13 @@ public class MongoDao {
 	private final String username = "root";
 	private final String password = "123456";
 	private final String uri = "mongodb://%s:%s@" + addr + ":27017";
-	private final String uri2 = "mongodb+srv://Arya:arya12@cluster0.ehq1k.mongodb.net/?retryWrites=true&w=majority";
 	private final String uriDb = String.format(uri,username, password);
 	public MongoDao() {
         // TODO: 
         // Connect to the mongodb database and create the database and collection. 
         // Use Dotenv like in the DAOs of the other microservices.
 		try {
-			MongoClient mongo = MongoClients.create(this.uri2);
+			MongoClient mongo = MongoClients.create(this.uriDb);
 			MongoDatabase database = mongo.getDatabase("trip");
 			System.out.println(database);
 			this.collection = database.getCollection("trips");
