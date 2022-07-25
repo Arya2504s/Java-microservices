@@ -4,6 +4,7 @@ import java.io.IOException;
 import org.json.*;
 import org.neo4j.driver.*;
 import com.sun.net.httpserver.HttpExchange;
+import org.neo4j.driver.Record;
 
 public class Route extends Endpoint {
 
@@ -36,6 +37,12 @@ public class Route extends Endpoint {
             if (!result.hasNext()) {
                 this.sendStatus(r, 404);
                 return;
+            }
+            for (Record rec: result.list()) {
+                System.out.println(rec);
+                rec.keys().forEach(key -> {
+                    System.out.println(rec.get(key));
+                });
             }
             this.sendResponse(r, new JSONObject(), 200);
         } catch (Exception e) {

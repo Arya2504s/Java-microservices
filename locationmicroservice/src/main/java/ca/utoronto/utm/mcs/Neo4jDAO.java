@@ -2,6 +2,7 @@ package ca.utoronto.utm.mcs;
 
 import org.neo4j.driver.*;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.neo4j.driver.Record;
 
 public class Neo4jDAO {
 
@@ -45,6 +46,7 @@ public class Neo4jDAO {
         return this.session.run(query);
     }
 
+
     public Result updateUserIsDriver(String uid, boolean isDriver) {
         String query = "MATCH (n:user {uid: '%s'}) SET n.is_driver = %b RETURN n";
         query = String.format(query, uid, isDriver);
@@ -76,7 +78,7 @@ public class Neo4jDAO {
     }
 
     public Result createRoute(String roadname1, String roadname2, int travel_time, boolean has_traffic) {
-        String query = "MATCH (r1:road {name: '%s'}), (r2:road {name: '%s'}) CREATE (r1) -[r:ROUTE_TO {travel_time: %d, has_traffic: %b}]->(r2) RETURN type(r)";
+        String query = "MATCH (r1:road {name: '%s'}), (r2:road {name: '%s'}) CREATE (r1) -[r:ROUTE_TO {travel_time: %d, has_traffic: %b}]->(r2) RETURN r.travel_time";
         query = String.format(query, roadname1, roadname2, travel_time, has_traffic);
         return this.session.run(query);
     }
@@ -86,4 +88,50 @@ public class Neo4jDAO {
         query = String.format(query, roadname1, roadname2);
         return this.session.run(query);
     }
-} 
+
+    public Result getAllDriversInRadius(Double radius, Double longitude, Double latitude) {
+        String query = "MATCH (n: user {is_driver: true })"
+            + " WITH point({longitude: n.longitude, latitude: n.latitude}) AS driverPoint,"
+            + " point({longitude: %f, latitude: %f}) AS userPoint, n"
+            + " WHERE round(point.distance(driverPoint, userPoint)) < %f"
+            + " RETURN n.uid, driverPoint, userPoint, n.longitude, n.latitude, n.street";
+        query = String.format(query, longitude, latitude, radius);
+        return this.session.run(query);
+    }
+
+    public Result getNavigationPath(String startStreet, String destinationStreet){
+        try {
+            String query = "CALL gds.graph.exists('routeGraph')";
+            Result result = this.session.run(query);
+            Boolean exists = false;
+            for (Record res: result.list()){
+                exists = Boolean.valueOf(res.get("exists").toString());
+                System.out.println(exists);
+            }
+            if (!exists){
+                query = "CALL gds.graph.create('routeGraph', 'road', 'ROUTE_TO', {relationshipProperties:['travel_time']})";
+                this.session.run(query);
+                System.out.println("Creating routeGraph for the first time");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String query = "MATCH (source: road {name: %s}), (target: road {name: %s})"
+            + " CALL gds.shortestPath.dijkstra.stream('routeGraph',"
+            + " {sourceNode: source, targetNode: target, relationshipWeightProperty: 'travel_time'})"
+            + " YIELD index, sourceNode, targetNode, totalCost, nodeIds, costs, path"
+            + " RETURN index, totalCost, [nodeId IN nodeIds | gds.util.asNode(nodeId).name] AS roadNames, "
+            + " [nodeId IN nodeIds | gds.util.asNode(nodeId).has_traffic] AS roadTraffics, costs";
+        query = String.format(query, startStreet, destinationStreet);
+        System.out.println(query);
+        return this.session.run(query);
+    }
+
+    public void deleteAll() {
+        String query = "MATCH (n) DETACH DELETE n";
+        this.session.run(query);
+        return;
+    }
+
+}
