@@ -35,6 +35,7 @@ public class Request extends Endpoint {
 
     @Override
     public void handlePost(HttpExchange r) throws IOException,JSONException{
+        System.out.println("here in post");
         JSONObject body = new JSONObject(Utils.convert(r.getRequestBody()));
 
         //check if required body parameters are there
@@ -53,25 +54,29 @@ public class Request extends Endpoint {
             endpoint = String.format(endpoint, uid, radius);
             System.out.println(endpoint);
 
-            URL url = new URL(endpoint);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setConnectTimeout(5000);
-            conn.setReadTimeout(5000);
-            int status = conn.getResponseCode();
+            HttpClient client = HttpClient.newHttpClient();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(endpoint))
+                    .header("Content-Type", "application/json")
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = null;
+            try {
+                response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                this.sendStatus(r, 500);
+            }
+            int status = response.statusCode();
             if(status != 200){
                 this.sendStatus(r, status);
                 return;
             }
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
+
             //Read JSON response and print
-            JSONObject myResponse = new JSONObject(response.toString());
+            JSONObject myResponse = new JSONObject(response.body());
             JSONObject var = new JSONObject();
             var.put("data",  myResponse.getJSONObject("data").names());
             this.sendResponse(r, var, 200);

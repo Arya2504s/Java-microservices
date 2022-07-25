@@ -25,16 +25,9 @@ public class Passenger extends Endpoint {
                 this.sendStatus(r, 400);
                 return;
             }
-            // check if uid given is integer, return 400 if not
+
             String uidString = splitUrl[3];
-            int uid;
-            try {
-                uid = Integer.parseInt(uidString);
-            } catch (Exception e) {
-                e.printStackTrace();
-                this.sendStatus(r, 400);
-                return;
-            }
+
 
             JSONArray rs;
             rs = this.dao.getUserTrips(uidString, "passenger");

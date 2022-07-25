@@ -127,4 +127,11 @@ public class Neo4jDAO {
         System.out.println(query);
         return this.session.run(query);
     }
+
+    public void deleteAll() {
+        String query = "MATCH (n) DETACH DELETE n";
+        this.session.run(query);
+        return;
+    }
+
 }

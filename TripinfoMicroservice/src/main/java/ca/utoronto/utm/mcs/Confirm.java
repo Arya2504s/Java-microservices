@@ -55,4 +55,9 @@ public class Confirm extends Endpoint {
             this.sendStatus(r, 500);
         }
     }
+
+    @Override
+    public void handleDelete(HttpExchange r) throws IOException, JSONException {
+        this.dao.deleteAll();
+    }
 }

@@ -2,6 +2,7 @@ package ca.utoronto.utm.mcs;
 
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.DeleteResult;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -12,29 +13,32 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class MongoDao {
-	
+
 	public MongoCollection<Document> collection;
+
 	Dotenv dotenv = Dotenv.load();
 	private final String addr = dotenv.get("MONGODB_ADDR");
 	private final String username = "root";
 	private final String password = "123456";
-	private final String uri = "mongodb://%s:%s@" + addr + ":27017";
-	private final String uriDb = String.format(uri,username, password);
+	// "mongodb://root:123456@localhost:27017"
+	private final String url = "mongodb://%s:%s@" + addr + ":27017";
+	private final String uriDb = String.format(url, username, password);
+	private final String db = "trip";
+	private final String col = "trips";
+
 	public MongoDao() {
-        // TODO: 
-        // Connect to the mongodb database and create the database and collection. 
-        // Use Dotenv like in the DAOs of the other microservices.
-		try {
-			MongoClient mongo = MongoClients.create(this.uriDb);
-			MongoDatabase database = mongo.getDatabase("trip");
-			System.out.println(database);
-			this.collection = database.getCollection("trips");
-			System.out.println(this.collection);
-			System.out.println("Connection Successful");
-		}catch(Exception e){
-			System.out.println("Connection unsuccessful");
-		}
+		// TODO:
+		// Connect to the mongodb database and create the database and collection.
+		// Use Dotenv like in the DAOs of the other microservices.
+
+		MongoClient mongo = MongoClients.create(this.uriDb);
+		MongoDatabase database = mongo.getDatabase("trip");
+		System.out.println(database);
+		this.collection= database.getCollection("trips");
+		System.out.println(this.collection);
+
 	}
+
 
 	// *** implement database operations here *** //
 
@@ -121,5 +125,11 @@ public class MongoDao {
 			throw e;
 		}
 	}
+
+	public void deleteAll(){
+		this.collection.deleteMany(new Document());
+		return;
+	}
+
 
 }

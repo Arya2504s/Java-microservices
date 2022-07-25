@@ -48,7 +48,7 @@ public class RequestRouter implements HttpHandler {
 			requestURL = "http://usermicroservice:8000"+ r.getRequestURI();
 		}
 		else if (splitUrl[1].equals("trip")) {
-			requestURL = "http://tripinfonmicroservice:8000"+ r.getRequestURI();
+			requestURL = "http://tripinfomicroservice:8000"+ r.getRequestURI();
 		}
 
 		try {
@@ -59,7 +59,7 @@ public class RequestRouter implements HttpHandler {
 			HttpRequest request = HttpRequest.newBuilder()
 					.uri(URI.create(requestURL))
 					.header("Content-Type", "application/json")
-					.method(r.getRequestMethod(), BodyPublishers.ofString(body))
+					.method(r.getRequestMethod(), BodyPublishers.ofString(body)).version(HttpClient.Version.HTTP_1_1)
 					.timeout(Duration.ofSeconds(5))
 					.build();
 			HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
