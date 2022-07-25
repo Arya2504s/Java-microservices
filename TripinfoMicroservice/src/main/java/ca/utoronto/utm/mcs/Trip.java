@@ -29,7 +29,7 @@ public class Trip extends Endpoint {
                 return;
             }
 
-            ObjectId tripId = null;
+            ObjectId tripId;
             String trip_id = splitUrl[2];
             try {
                 tripId = new ObjectId(trip_id);

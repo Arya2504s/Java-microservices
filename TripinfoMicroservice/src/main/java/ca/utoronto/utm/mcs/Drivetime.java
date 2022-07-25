@@ -43,8 +43,8 @@ public class Drivetime extends Endpoint {
                 return;
             }
 
-            ObjectId tripId = null;
-            String trip_id = splitUrl[2];
+            ObjectId tripId;
+            String trip_id = splitUrl[3];
             try {
                 tripId = new ObjectId(trip_id);
             } catch (IllegalArgumentException e) {
@@ -63,23 +63,19 @@ public class Drivetime extends Endpoint {
             endpoint = String.format(endpoint, driver, passenger);
             System.out.println(endpoint);
 
-            URL url = new URL(endpoint);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setConnectTimeout(5000);
-            conn.setReadTimeout(5000);
-            int status = conn.getResponseCode();
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(endpoint))
+                    .header("Content-Type", "application/json")
+                    .GET()
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            int status = response.statusCode();
             if(status != 200){
                 this.sendStatus(r, status);
                 return;
             }
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
+
             //Read JSON response and print
             JSONObject myResponse = new JSONObject(response.toString());
             JSONObject data = myResponse.getJSONObject("data");
