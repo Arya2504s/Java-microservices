@@ -78,8 +78,10 @@ public class Nearby extends Endpoint {
             for (Record rec : result.list()) {
                 Double driverLong = Double.parseDouble(rec.get("n.longitude").toString());
                 Double driverLat = Double.parseDouble(rec.get("n.latitude").toString());
-                String driverStreet = rec.get("n.street").toString();
-                String driverId = rec.get("n.uid").toString();
+                String driverStreet = rec.get("n.street").toString().replaceAll("\"", "");
+                String driverId = rec.get("n.uid").toString().replaceAll("\"", "");
+
+                System.out.println(driverId);
 
                 JSONObject driver = new JSONObject();
                 driver.put("longitude", driverLong);

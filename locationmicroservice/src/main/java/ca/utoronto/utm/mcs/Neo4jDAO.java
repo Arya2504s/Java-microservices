@@ -109,7 +109,7 @@ public class Neo4jDAO {
                 System.out.println(exists);
             }
             if (!exists){
-                query = "CALL gds.graph.project('routeGraph', 'road', 'ROUTE_TO', {relationshipProperties:['travel_time']})";
+                query = "CALL gds.graph.create('routeGraph', 'road', 'ROUTE_TO', {relationshipProperties:['travel_time']})";
                 this.session.run(query);
                 System.out.println("Creating routeGraph for the first time");
             }
