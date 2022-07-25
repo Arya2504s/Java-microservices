@@ -35,6 +35,7 @@ public class Request extends Endpoint {
 
     @Override
     public void handlePost(HttpExchange r) throws IOException,JSONException{
+        System.out.println("here in post");
         JSONObject body = new JSONObject(Utils.convert(r.getRequestBody()));
 
         //check if required body parameters are there
@@ -75,7 +76,7 @@ public class Request extends Endpoint {
             }
 
             //Read JSON response and print
-            JSONObject myResponse = new JSONObject(response.toString());
+            JSONObject myResponse = new JSONObject(response.body());
             JSONObject var = new JSONObject();
             var.put("data",  myResponse.getJSONObject("data").names());
             this.sendResponse(r, var, 200);

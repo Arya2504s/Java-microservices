@@ -13,6 +13,7 @@ public class App {
         server.createContext("/location/road", new Road());
         server.createContext("/location/hasRoute", new Route());
         server.createContext("/location/route", new Route());
+        server.createContext("/location/deleteAll", new Location());
         
         // TODO: Add server contexts here. Do not set executors for the server, you shouldn't need them.
         server.createContext("/location/nearbyDriver", new Nearby());

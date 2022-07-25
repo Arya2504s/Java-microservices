@@ -15,29 +15,29 @@ public class Trip extends Endpoint {
      * @param _id
      * @body distance, endTime, timeElapsed, totalCost
      * @return 200, 400, 404
-     * Adds extra information to the trip with the given id when the 
-     * trip is done. 
+     * Adds extra information to the trip with the given id when the
+     * trip is done.
      */
 
     @Override
     public void handlePatch(HttpExchange r) throws IOException, JSONException {
         // TODO
         try {
+            System.out.println("here");
             String[] splitUrl = r.getRequestURI().getPath().split("/");
             if (splitUrl.length != 3) {
+                System.out.println("here err");
                 this.sendStatus(r, 400);
                 return;
             }
 
-            ObjectId tripId;
             String trip_id = splitUrl[2];
-            try {
-                tripId = new ObjectId(trip_id);
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
+            if (!ObjectId.isValid(trip_id)) {
+                System.out.println("error id");
                 this.sendStatus(r, 400);
                 return;
             }
+
             String[] fields = {"distance", "endTime", "timeElapsed","totalCost"};
             Class<?>[] fieldClasses = {Integer.class, Integer.class, Integer.class, String.class};
             JSONObject body = new JSONObject(Utils.convert(r.getRequestBody()));
@@ -51,7 +51,7 @@ public class Trip extends Endpoint {
             endTime = body.getInt("endTime");
             timeElapsed = body.getInt("timeElapsed");
             totalCost = body.getString("totalCost");
-            boolean res = this.dao.updateTrip(endTime, totalCost, timeElapsed,distance, tripId);
+            boolean res = this.dao.updateTrip(endTime, totalCost, timeElapsed,distance, new ObjectId(trip_id));
             if(!res){
                 this.sendStatus(r,404);
                 return;

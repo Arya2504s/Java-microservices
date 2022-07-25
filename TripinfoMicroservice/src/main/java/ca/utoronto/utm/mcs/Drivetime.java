@@ -37,26 +37,25 @@ public class Drivetime extends Endpoint {
     @Override
     public void handleGet(HttpExchange r) throws IOException, JSONException {
         try{
+
             String[] splitUrl = r.getRequestURI().getPath().split("/");
             if (splitUrl.length != 4) {
                 this.sendStatus(r, 400);
                 return;
             }
 
-            ObjectId tripId;
             String trip_id = splitUrl[3];
-            try {
-                tripId = new ObjectId(trip_id);
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
+            if (!ObjectId.isValid(trip_id)) {
+                System.out.println(trip_id);
+                System.out.println("error id");
                 this.sendStatus(r, 400);
                 return;
             }
-
-            if(!this.dao.tripExists(tripId)){
+            if(!this.dao.tripExists(new ObjectId(trip_id))){
                 this.sendStatus(r, 404);
             }
-            ArrayList<String> tripInfo = this.dao.tripInfo(tripId);
+            
+            ArrayList<String> tripInfo = this.dao.tripInfo(new ObjectId(trip_id));
             String driver = tripInfo.get(0);
             String passenger = tripInfo.get(1);
             String endpoint = "http://locationmicroservice:8000/location/navigation/:%s?passengerUid=%s";
@@ -77,7 +76,7 @@ public class Drivetime extends Endpoint {
             }
 
             //Read JSON response and print
-            JSONObject myResponse = new JSONObject(response.toString());
+            JSONObject myResponse = new JSONObject(response.body());
             JSONObject data = myResponse.getJSONObject("data");
             JSONObject var = new JSONObject();
             var.put("arrival_time", data.getInt("total_time"));

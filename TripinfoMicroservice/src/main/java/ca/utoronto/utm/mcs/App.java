@@ -16,6 +16,7 @@ public class App {
         server.createContext("/trip/confirm", new Confirm());
         server.createContext("/trip/driverTime", new Drivetime());
         server.createContext("/trip/request", new Request());
+        server.createContext("/trip/deleteAll", new Confirm());
         server.start();
         System.out.printf("Server started on port %d...\n", PORT);
     }
